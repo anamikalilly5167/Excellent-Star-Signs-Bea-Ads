@@ -1,0 +1,60 @@
+{% extends "admin/base.html" %}
+{% block heading %}Gallery{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <div class="panel-header"><h2>Upload Image</h2></div>
+  <form method="post" enctype="multipart/form-data" class="grid-form">
+    <input type="text" name="title" placeholder="Title (optional)">
+    <select name="category_id">
+      <option value="">No category</option>
+      {% for cat in categories %}<option value="{{ cat.id }}">{{ cat.name }}</option>{% endfor %}
+    </select>
+    <input type="file" name="image" accept="image/*" required>
+    <button type="submit" class="btn-primary">Upload</button>
+  </form>
+</div>
+
+<div class="panel">
+  <div class="panel-header"><h2>All Gallery Images</h2></div>
+  <p class="panel-note">Mark up to 5 images as "Feature in Hero" to show them as a rotating slideshow on the homepage.</p>
+  <table class="admin-table">
+    <thead><tr><th>Image</th><th>Title / Category</th><th>Hero</th><th></th></tr></thead>
+    <tbody>
+      {% for img in images %}
+      <tr>
+        <td><img src="{{ url_for('static', filename=img.image_path) }}" class="thumb-lg"></td>
+        <td>
+          <form method="post" action="{{ url_for('admin_gallery_edit', image_id=img.id) }}" class="row-edit-form">
+            <input type="text" name="title" value="{{ img.title or '' }}" placeholder="Title">
+            <select name="category_id">
+              <option value="">No category</option>
+              {% for cat in categories %}
+                <option value="{{ cat.id }}" {% if cat.id == img.category_id %}selected{% endif %}>{{ cat.name }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn-sm">Save</button>
+          </form>
+        </td>
+        <td>
+          <form method="post" action="{{ url_for('admin_gallery_feature', image_id=img.id) }}">
+            {% if img.featured_hero %}
+            <button type="submit" class="btn-sm btn-featured">&#9733; Featured</button>
+            {% else %}
+            <button type="submit" class="btn-sm">Feature in Hero</button>
+            {% endif %}
+          </form>
+        </td>
+        <td>
+          <form method="post" action="{{ url_for('admin_gallery_delete', image_id=img.id) }}" onsubmit="return confirm('Delete this image?')">
+            <button type="submit" class="btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if not images %}<p class="empty-note">No gallery images yet.</p>{% endif %}
+</div>
+
+{% endblock %}

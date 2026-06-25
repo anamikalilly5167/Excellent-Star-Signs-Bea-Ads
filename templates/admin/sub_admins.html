@@ -1,0 +1,58 @@
+{% extends "admin/base.html" %}
+{% block heading %}Sub Admins{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <div class="panel-header"><h2>Add Sub Admin</h2></div>
+  <form method="post" class="grid-form">
+    <input type="email" name="email" placeholder="Email" required>
+    <input type="password" name="password" placeholder="Password (min 6 characters)" required minlength="6">
+    <div class="permission-group full-width">
+      {% for p in all_permissions %}
+      <label class="permission-check"><input type="checkbox" name="permissions" value="{{ p }}"> {{ p|capitalize }}</label>
+      {% endfor %}
+    </div>
+    <button type="submit" class="btn-primary">Add Sub Admin</button>
+  </form>
+</div>
+
+<div class="panel">
+  <div class="panel-header"><h2>All Sub Admins</h2></div>
+  <table class="admin-table">
+    <thead><tr><th>Email</th><th>Permissions</th><th>Created</th><th></th></tr></thead>
+    <tbody>
+      {% for sa in sub_admins %}
+      <tr>
+        <td>{{ sa.email }}</td>
+        <td>{{ sa.permissions.replace(',', ', ') if sa.permissions else '-' }}</td>
+        <td>{{ sa.created_at[:10] }}</td>
+        <td>
+          <button class="btn-sm" onclick="document.getElementById('edit-{{ sa.id }}').classList.toggle('open')">Edit</button>
+          <form method="post" action="{{ url_for('admin_sub_admin_delete', admin_id=sa.id) }}" class="inline-block" onsubmit="return confirm('Delete this sub admin?')">
+            <button type="submit" class="btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <tr id="edit-{{ sa.id }}" class="edit-row">
+        <td colspan="4">
+          <form method="post" action="{{ url_for('admin_sub_admin_edit', admin_id=sa.id) }}" class="grid-form">
+            <input type="password" name="password" placeholder="New password (leave blank to keep current)" minlength="6">
+            <div class="permission-group full-width">
+              {% set sa_perms = (sa.permissions or '').split(',') %}
+              {% for p in all_permissions %}
+              <label class="permission-check">
+                <input type="checkbox" name="permissions" value="{{ p }}" {% if p in sa_perms %}checked{% endif %}> {{ p|capitalize }}
+              </label>
+              {% endfor %}
+            </div>
+            <button type="submit" class="btn-primary">Save Changes</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% if not sub_admins %}<p class="empty-note">No sub admins yet.</p>{% endif %}
+</div>
+
+{% endblock %}

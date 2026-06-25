@@ -1,0 +1,53 @@
+{% extends "admin/base.html" %}
+{% block heading %}Dashboard{% endblock %}
+{% block content %}
+
+<div class="stat-grid">
+  <div class="stat-card">
+    <p class="stat-num">{{ counts.categories }}</p>
+    <p class="stat-label">Categories</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-num">{{ counts.services }}</p>
+    <p class="stat-label">Services</p>
+  </div>
+  <div class="stat-card">
+    <p class="stat-num">{{ counts.gallery }}</p>
+    <p class="stat-label">Gallery Images</p>
+  </div>
+  <div class="stat-card stat-card--accent">
+    <p class="stat-num">{{ counts.enquiries }}</p>
+    <p class="stat-label">New Enquiries</p>
+  </div>
+  <div class="stat-card" style="border-left: 3px solid #F59E0B;">
+    <p class="stat-num" style="color:#F59E0B">{{ counts.reviews_pending }}</p>
+    <p class="stat-label">Reviews Pending</p>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-header">
+    <h2>Recent Enquiries</h2>
+    <a href="{{ url_for('admin_enquiries') }}">View all &rarr;</a>
+  </div>
+  {% if recent_enquiries %}
+  <table class="admin-table">
+    <thead><tr><th>Name</th><th>Phone</th><th>Service</th><th>Date</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for e in recent_enquiries %}
+      <tr>
+        <td>{{ e.name }}</td>
+        <td>{{ e.phone }}</td>
+        <td>{{ e.service_name or "-" }}</td>
+        <td>{{ e.created_at[:16] }}</td>
+        <td><span class="status-pill status-{{ e.status }}">{{ e.status }}</span></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="empty-note">No enquiries yet.</p>
+  {% endif %}
+</div>
+
+{% endblock %}

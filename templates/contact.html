@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Contact Us | {{ settings.site_title }}{% endblock %}
+{% block content %}
+
+<section class="page-header">
+  <p class="breadcrumb"><a href="{{ url_for('index') }}">Home</a> / Contact Us</p>
+  <h1>Contact Us</h1>
+</section>
+
+<section class="contact-section">
+  <div class="contact-details">
+    <div class="contact-block">
+      <h3>Phone</h3>
+      <p><a href="tel:{{ settings.phone_1 }}">{{ settings.phone_1 }}</a></p>
+      {% if settings.phone_2 %}<p><a href="tel:{{ settings.phone_2 }}">{{ settings.phone_2 }}</a></p>{% endif %}
+    </div>
+    <div class="contact-block">
+      <h3>Landline</h3>
+      <p>{{ settings.landline }}</p>
+    </div>
+    <div class="contact-block">
+      <h3>Email</h3>
+      <p><a href="mailto:{{ settings.email }}">{{ settings.email }}</a></p>
+    </div>
+    <div class="contact-block">
+      <h3>Address</h3>
+      <p>{{ settings.address }}</p>
+    </div>
+    <div class="contact-block">
+      <h3>Business Hours</h3>
+      <p class="contact-hours">{{ settings.business_hours }}</p>
+    </div>
+    <div class="contact-block">
+      <h3>Follow Us</h3>
+      <div class="contact-social-large">
+        <a href="{{ settings.whatsapp }}">WhatsApp</a>
+        <a href="{{ settings.instagram }}">Instagram</a>
+        <a href="{{ settings.facebook }}">Facebook</a>
+      </div>
+    </div>
+    <button class="btn-hero" onclick="openEnquiryModal()">Send Us a Message</button>
+  </div>
+
+  {% if settings.map_embed_url %}
+  <div class="contact-map">
+    <iframe src="{{ settings.map_embed_url }}" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+  </div>
+  {% endif %}
+</section>
+
+{% endblock %}

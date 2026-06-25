@@ -1,0 +1,52 @@
+{% extends "admin/base.html" %}
+{% block heading %}Categories{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <div class="panel-header"><h2>Add Category</h2></div>
+  <form method="post" class="inline-form">
+    <input type="text" name="name" placeholder="Category name" required>
+    <select name="company_id">
+      <option value="">No company tag</option>
+      {% for c in companies %}<option value="{{ c.id }}">{{ c.name }}</option>{% endfor %}
+    </select>
+    <button type="submit" class="btn-primary">Add</button>
+  </form>
+</div>
+
+<div class="panel">
+  <div class="panel-header"><h2>All Categories</h2></div>
+  <table class="admin-table">
+    <thead><tr><th>Name</th><th>Company Tag</th><th></th></tr></thead>
+    <tbody>
+      {% for cat in categories %}
+      <tr>
+        <td>{{ cat.name }}</td>
+        <td>{{ cat.company_name or "-" }}</td>
+        <td>
+          <button class="btn-sm" onclick="document.getElementById('edit-{{ cat.id }}').classList.toggle('open')">Edit</button>
+          <form method="post" action="{{ url_for('admin_category_delete', category_id=cat.id) }}" class="inline-block" onsubmit="return confirm('Delete this category and all its services?')">
+            <button type="submit" class="btn-sm btn-danger">Delete</button>
+          </form>
+        </td>
+      </tr>
+      <tr id="edit-{{ cat.id }}" class="edit-row">
+        <td colspan="3">
+          <form method="post" action="{{ url_for('admin_category_edit', category_id=cat.id) }}" class="row-edit-form">
+            <input type="text" name="name" value="{{ cat.name }}" required>
+            <select name="company_id">
+              <option value="">No company tag</option>
+              {% for c in companies %}
+                <option value="{{ c.id }}" {% if c.id == cat.company_id %}selected{% endif %}>{{ c.name }}</option>
+              {% endfor %}
+            </select>
+            <button type="submit" class="btn-primary">Save Changes</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% endblock %}

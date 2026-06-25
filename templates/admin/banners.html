@@ -1,0 +1,31 @@
+{% extends "admin/base.html" %}
+{% block heading %}Banner & Logo{% endblock %}
+{% block content %}
+
+<div class="panel">
+  <div class="panel-header"><h2>Site Logo</h2></div>
+  <p class="panel-note">Uploading a new logo replaces it everywhere on the site (header, admin login, admin sidebar).</p>
+  <form method="post" enctype="multipart/form-data" class="inline-form">
+    <input type="file" name="logo_image" accept="image/*" required>
+    <button type="submit" class="btn-primary">Update Logo</button>
+  </form>
+</div>
+
+<div class="panel">
+  <div class="panel-header"><h2>Homepage Banner</h2></div>
+  <p class="panel-note">This image shows as the background behind the "Welcome to Excellent Star Signs &amp; Bea Ads" text on the homepage. Only one banner can be active &mdash; uploading a new one replaces the current one.</p>
+  {% if banner %}
+  <img src="{{ url_for('static', filename=banner.image_path) }}" class="thumb-lg" style="margin-bottom:14px">
+  {% endif %}
+  <form method="post" enctype="multipart/form-data" class="inline-form">
+    <input type="file" name="banner_image" accept="image/*" required>
+    <button type="submit" class="btn-primary">{{ 'Replace Banner' if banner else 'Upload Banner' }}</button>
+  </form>
+  {% if banner %}
+  <form method="post" action="{{ url_for('admin_banner_remove') }}" onsubmit="return confirm('Remove the current banner?')" style="margin-top:10px">
+    <button type="submit" class="btn-sm btn-danger">Remove Banner</button>
+  </form>
+  {% endif %}
+</div>
+
+{% endblock %}

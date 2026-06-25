@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ settings.site_title }}{% endblock %}</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<header class="site-header">
+  <div class="header-inner">
+    <a href="{{ url_for('index') }}" class="brand-logos">
+      <img src="{{ url_for('static', filename=logo_path) }}" alt="Excellent Star Signs & Bea Ads" class="brand-logo-img">
+    </a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <div class="header-contact" id="headerContact">
+      <a href="tel:{{ settings.phone_1 }}" class="contact-line">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M6.6 10.8a15.2 15.2 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A18 18 0 0 1 2 3a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1 11.4 11.4 0 0 0 .57 3.6 1 1 0 0 1-.25 1z" fill="currentColor"/></svg>
+        {{ settings.phone_1 }}
+      </a>
+      <a href="mailto:{{ settings.email }}" class="contact-line">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M2 5h20v14H2z" stroke="currentColor" stroke-width="1.6" fill="none"/><path d="M2 6l10 7 10-7" stroke="currentColor" stroke-width="1.6" fill="none"/></svg>
+        {{ settings.email }}
+      </a>
+      <div class="contact-social">
+        <a href="{{ settings.whatsapp }}" aria-label="WhatsApp">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12c0 1.85.5 3.58 1.38 5.06L2 22l5.06-1.32A9.94 9.94 0 0 0 12 22c5.52 0 10-4.48 10-10S17.52 2 12 2zm0 18c-1.6 0-3.13-.43-4.45-1.18l-.32-.18-3.05.8.81-2.97-.2-.31A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8s8 3.59 8 8-3.59 8-8 8zm4.32-5.86c-.24-.12-1.4-.69-1.62-.77-.22-.08-.38-.12-.54.12-.16.24-.62.77-.76.93-.14.16-.28.18-.52.06-1.4-.7-2.32-1.25-3.24-2.84-.25-.42.25-.39.71-1.3.08-.16.04-.3-.04-.42-.08-.12-.54-1.3-.74-1.78-.2-.46-.4-.4-.55-.4-.14 0-.3-.02-.46-.02-.16 0-.42.06-.64.3-.22.24-.85.83-.85 2.02 0 1.2.87 2.36 1 2.52.12.16 1.66 2.54 4.04 3.46 2 .78 2.4.62 2.84.58.44-.04 1.4-.57 1.6-1.13.2-.55.2-1.02.14-1.13-.06-.1-.22-.16-.46-.28z"/></svg>
+        </a>
+        <a href="{{ settings.instagram }}" aria-label="Instagram">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><rect x="2.5" y="2.5" width="19" height="19" rx="5" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="12" r="4.2" stroke="currentColor" stroke-width="1.8"/><circle cx="17.4" cy="6.6" r="1.1" fill="currentColor"/></svg>
+        </a>
+        <a href="{{ settings.facebook }}" aria-label="Facebook">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.91h2.54V9.8c0-2.5 1.49-3.89 3.78-3.89 1.1 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.77-1.63 1.56v1.87h2.78l-.44 2.91h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z"/></svg>
+        </a>
+      </div>
+      <button class="btn-enquire" onclick="openEnquiryModal()">Get a Quote</button>
+    </div>
+  </div>
+</header>
+
+<div class="layout-shell">
+  <aside class="sidebar" id="sidebar">
+    <p class="sidebar-heading">Catalogue</p>
+    <nav class="sidebar-nav">
+      {% for cat in categories %}
+      <a href="{{ url_for('category_view', slug=cat.slug) }}"
+         class="sidebar-link {% if active_category == cat.id %}active{% endif %}">{{ cat.name }}</a>
+      {% endfor %}
+      <a href="{{ url_for('gallery') }}" class="sidebar-link sidebar-link--extra">Gallery</a>
+      <a href="{{ url_for('contact') }}" class="sidebar-link sidebar-link--extra">Contact Us</a>
+    </nav>
+  </aside>
+
+  <main class="main-content">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <strong>Excellent Star Signs</strong> &amp; <strong>Bea Ads</strong>
+      <p>Signage fabrication, printing &amp; branding under one roof.</p>
+    </div>
+    <div class="footer-contact">
+      <p>{{ settings.address }}</p>
+      <p>{{ settings.phone_1 }} &middot; {{ settings.landline }}</p>
+      <p>{{ settings.email }}</p>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>&copy; {{ 2026 }} Excellent Star Signs &amp; Bea Ads. All rights reserved.</span>
+    <a href="{{ url_for('admin_login') }}" class="staff-access-link">Staff Access</a>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="enquiryModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeEnquiryModal()">&times;</button>
+    <h3>Get a Quote</h3>
+    <p class="modal-sub">Tell us what you need — we'll call you back.</p>
+    <form id="enquiryForm">
+      <input type="hidden" name="service_name" id="enquiryServiceName" value="">
+      <label>Name<input type="text" name="name" required></label>
+      <label>Phone<input type="tel" name="phone" required></label>
+      <label>Email (optional)<input type="email" name="email"></label>
+      <label>Message<textarea name="message" rows="3" placeholder="e.g. Need an LED sign board, 6x3 ft"></textarea></label>
+      <button type="submit" class="btn-submit">Send Enquiry</button>
+      <p class="form-status" id="enquiryStatus"></p>
+    </form>
+  </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
