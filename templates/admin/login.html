@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin Login | Excellent Star Signs</title>
+<link href="https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body class="login-body">
+  <form class="login-box" id="loginForm">
+    <div class="admin-logo admin-logo--center"><img src="{{ url_for('static', filename=logo_path) }}" alt="Excellent Star Signs & Bea Ads"></div>
+    <h2>Staff Access</h2>
+    <p class="login-error" id="loginError" style="display:none"></p>
+    <label>Email<input type="email" name="email" id="loginEmail" required autofocus></label>
+    <label>Password<input type="password" name="password" required></label>
+    <button type="submit">Log In</button>
+    <p id="otpSentMsg" style="display:none;text-align:center;font-size:12.5px;background:#e6f4ea;color:#2d7a3a;padding:8px 10px;border-radius:4px;margin-top:8px">✓ OTP sent to your email!</p>
+    <p style="text-align:center;margin-top:10px"><a href="#" id="forgotLink" style="font-size:12.5px">Forgot password?</a></p>
+  </form>
+
+  <form class="login-box" id="otpForm" style="display:none">
+    <div class="admin-logo admin-logo--center"><img src="{{ url_for('static', filename=logo_path) }}" alt="Excellent Star Signs & Bea Ads"></div>
+    <h2>Verify OTP</h2>
+    <p class="login-error" id="otpError" style="display:none"></p>
+    <p id="otpInfo" style="font-size:12.5px;text-align:center"></p>
+    <label>Enter OTP<input type="text" name="otp" id="otpInput" required></label>
+    <button type="submit">Verify</button>
+  </form>
+
+  <form class="login-box" id="resetForm" style="display:none">
+    <div class="admin-logo admin-logo--center"><img src="{{ url_for('static', filename=logo_path) }}" alt="Excellent Star Signs & Bea Ads"></div>
+    <h2>Set New Password</h2>
+    <p class="login-error" id="resetError" style="display:none"></p>
+    <label>New Password<input type="password" name="new_password" id="newPasswordInput"></label>
+    <button type="submit">Save & Continue</button>
+    <p style="text-align:center;margin-top:10px"><a href="#" id="skipLink" style="font-size:12.5px">Skip for now</a></p>
+  </form>
+
+  <script>
+    var resetEmail = "";
+
+    document.getElementById("loginForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var errorBox = document.getElementById("loginError");
+      fetch("{{ url_for('admin_login') }}", { method: "POST", body: new FormData(this), cache: "no-store" })
+        .then(function (r) { return r.json().then(function (data) { return { status: r.status, data: data }; }); })
+        .then(function (res) {
+          if (res.data.ok) {
+            location.replace(res.data.redirect);
+          } else {
+            errorBox.textContent = res.data.error;
+            errorBox.style.display = "block";
+          }
+        })
+        .catch(function () {
+          errorBox.textContent = "Something went wrong. Please try again.";
+          errorBox.style.display = "block";
+        });
+    });
+
+    document.getElementById("forgotLink").addEventListener("click", function (e) {
+      e.preventDefault();
+      var email = document.getElementById("loginEmail").value.trim();
+      var errorBox = document.getElementById("loginError");
+      if (!email) {
+        errorBox.textContent = "Enter your email above first.";
+        errorBox.style.display = "block";
+        return;
+      }
+      errorBox.style.display = "none";
+      var fd = new FormData();
+      fd.append("email", email);
+      fetch("{{ url_for('admin_forgot_password') }}", { method: "POST", body: fd, cache: "no-store" })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.ok) {
+            resetEmail = email;
+            errorBox.style.display = "none";
+            var sentMsg = document.getElementById("otpSentMsg");
+            sentMsg.style.display = "block";
+            setTimeout(function () {
+              sentMsg.style.display = "none";
+              document.getElementById("otpInfo").textContent = "OTP sent to " + email;
+              document.getElementById("loginForm").style.display = "none";
+              document.getElementById("otpForm").style.display = "block";
+            }, 1800);
+          } else {
+            errorBox.textContent = data.error;
+            errorBox.style.display = "block";
+          }
+        });
+    });
+
+    document.getElementById("otpForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      var errorBox = document.getElementById("otpError");
+      var fd = new FormData();
+      fd.append("email", resetEmail);
+      fd.append("otp", document.getElementById("otpInput").value.trim());
+      fetch("{{ url_for('admin_verify_otp') }}", { method: "POST", body: fd, cache: "no-store" })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.ok) {
+            document.getElementById("otpForm").style.display = "none";
+            document.getElementById("resetForm").style.display = "block";
+          } else {
+            errorBox.textContent = data.error;
+            errorBox.style.display = "block";
+          }
+        });
+    });
+
+    function finishReset(newPassword) {
+      var errorBox = document.getElementById("resetError");
+      var fd = new FormData();
+      fd.append("email", resetEmail);
+      fd.append("new_password", newPassword || "");
+      fetch("{{ url_for('admin_reset_password') }}", { method: "POST", body: fd, cache: "no-store" })
+        .then(function (r) { return r.json(); })
+        .then(function (data) {
+          if (data.ok) {
+            location.replace(data.redirect);
+          } else {
+            errorBox.textContent = data.error;
+            errorBox.style.display = "block";
+          }
+        });
+    }
+
+    document.getElementById("resetForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      finishReset(document.getElementById("newPasswordInput").value);
+    });
+
+    document.getElementById("skipLink").addEventListener("click", function (e) {
+      e.preventDefault();
+      finishReset("");
+    });
+  </script>
+</body>
+</html>
